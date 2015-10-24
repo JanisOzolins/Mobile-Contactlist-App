@@ -1,0 +1,138 @@
+<head>
+  <title>lab10_3</title>
+</head>
+
+<body>
+
+</body>
+<!-- ====================== PAGE LAYOUT ============================ -->
+
+<template name='layout'>
+  {{#ionBody}}
+    {{> ionNavBar}}
+    {{#ionNavView}}
+      {{> yield}}
+    {{/ionNavView}}
+  {{/ionBody}}
+
+
+</template>
+
+<!-- ====================== FRONT PAGE ============================ -->
+
+<template name='page1'>
+{{#contentFor "headerButtonLeft"}}
+  {{>ionNavBackButton}}
+{{/contentFor}}
+
+  {{#contentFor "headerTitle"}}
+    <h1 class="title">Contact List</h1>
+  {{/contentFor}}
+
+{{#ionView}}
+  {{#ionContent}}
+    <!-- <a class='button button-full button-assertive' href='/page2'>Go to Page 2</a> -->
+    <a class='button button-full button-assertive' href='/addContactForm' id='addNewContact'>Add New Contact</a>
+   {{> lists}}
+  {{/ionContent}}
+{{/ionView}}
+</template>
+
+<!-- ====================== CONTACT DETAILS ============================ -->
+
+<template name='page2'>
+  {{#contentFor "headerButtonLeft"}}
+    {{>ionNavBackButton}}
+  {{/contentFor}}
+
+  {{#contentFor "headerTitle"}}
+    <h1 class="title">{{fName}} {{lName}}</h1>
+  {{/contentFor}}
+
+  {{#ionView}}
+    {{#ionContent}}
+      <a class='button button-full button-positive' href='/' >Go to Page 1</a>
+      {{> contactPage}}
+    {{/ionContent}}
+  {{/ionView}}
+</template>
+
+<!-- ====================== ADD FORM ============================ -->
+
+<template name='addContactForm'>
+  {{#contentFor "headerButtonLeft"}}
+    {{>ionNavBackButton}}
+  {{/contentFor}}
+
+  {{#contentFor "headerTitle"}}
+    <h1 class="title">Add Contact</h1>
+  {{/contentFor}}
+
+  {{#ionView}}
+    {{#ionContent}}
+      <a class='button button-full button-positive' href='/' >Go to Page 1</a>
+      {{> form}}
+    {{/ionContent}}
+  {{/ionView}}
+</template>
+
+<!-- ====================== LIST OF CONTACTS ============================ -->
+
+<template name="lists">
+
+      {{#ionList}}
+
+        {{#each contacts}}
+
+          {{#ionItem buttonRight=true avatar=true}}
+
+            <img src="https://randomuser.me/api/portraits/thumb/men/27.jpg">
+            <h2>{{fName}} {{lName}}</h2>
+            <p>
+              {{phone}}
+            </p>
+            <button class="button button-balanced" data-action="showActionSheet">{{> ionIcon icon="ios-arrow-forward"}}</button>
+
+          {{/ionItem}}
+
+        {{/each}}
+
+      {{/ionList}}
+
+</template>
+
+<!-- ====================== CONTACT DETAIL FORM ============================ -->
+
+<template name="form">
+  <form>
+    <div class="list">
+  <label class="item item-input">
+    <input type="text" name="fName" placeholder="First Name">
+  </label>
+  <label class="item item-input">
+    <input type="text" name="lName" placeholder="Last Name">
+  </label>
+  <label class="item item-input">
+    <input type="text" name="phone" placeholder="Phone">
+  </label>
+</div>
+<button class='button button-full button-positive' type="submit" href='https://mobile-janisozolins.c9.io/' >Save Contact</button>
+</form>
+
+
+</template>
+
+<!-- ====================== SINGLE CONTACT PAGE ============================ -->
+
+<template name="contactPage">
+<center><h2>Hello, {{fName}}!</h2></center>
+
+    <a class='button button-full button-assertive' href='/addContactForm' id='addContactForm'>Add New Contact</a>
+</template>
+
+
+
+
+
+
+
