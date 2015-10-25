@@ -1,5 +1,5 @@
 <head>
-  <title>lab10_3</title>
+  <title>My Contacts</title>
 </head>
 
 <body>
@@ -7,18 +7,16 @@
 </body>
 <!-- ====================== PAGE LAYOUT ============================ -->
 
-<template name='layout'>
+<template name="layout">
   {{#ionBody}}
-    {{> ionNavBar}}
+    {{> ionNavBar class="bar-positive"}}
     {{#ionNavView}}
       {{> yield}}
     {{/ionNavView}}
   {{/ionBody}}
-
-
 </template>
 
-<!-- ====================== FRONT PAGE ============================ -->
+<!-- ====================== FRONT PAGE ========================= -->
 
 <template name='page1'>
 {{#contentFor "headerButtonLeft"}}
@@ -38,9 +36,9 @@
 {{/ionView}}
 </template>
 
-<!-- ====================== CONTACT DETAILS ============================ -->
+<!-- ====================== EDIT FORM ========================== -->
 
-<template name='page2'>
+<template name='editContact'>
   {{#contentFor "headerButtonLeft"}}
     {{>ionNavBackButton}}
   {{/contentFor}}
@@ -51,8 +49,8 @@
 
   {{#ionView}}
     {{#ionContent}}
-      <a class='button button-full button-positive' href='/' >Go to Page 1</a>
-      {{> contactPage}}
+      <a class='button button-full button-positive' href='/' >BACK</a>
+      {{> editForm}}
     {{/ionContent}}
   {{/ionView}}
 </template>
@@ -70,13 +68,12 @@
 
   {{#ionView}}
     {{#ionContent}}
-      <a class='button button-full button-positive' href='/' >Go to Page 1</a>
       {{> form}}
     {{/ionContent}}
   {{/ionView}}
 </template>
 
-<!-- ====================== LIST OF CONTACTS ============================ -->
+<!-- ==================== LIST OF CONTACTS ====================== -->
 
 <template name="lists">
 
@@ -84,14 +81,14 @@
 
         {{#each contacts}}
 
-          {{#ionItem buttonRight=true avatar=true}}
+          {{#ionItem path='contact.detail' buttonRight=true avatar=true class="item-icon-right"}}
 
             <img src="https://randomuser.me/api/portraits/thumb/men/27.jpg">
             <h2>{{fName}} {{lName}}</h2>
             <p>
               {{phone}}
             </p>
-            <button class="button button-balanced" data-action="showActionSheet">{{> ionIcon icon="ios-arrow-forward"}}</button>
+            <a class="button button-balanced" href="/contact/{{_id}}">{{> ionIcon icon="ios-arrow-forward"}}</a>
 
           {{/ionItem}}
 
@@ -101,34 +98,156 @@
 
 </template>
 
-<!-- ====================== CONTACT DETAIL FORM ============================ -->
+
+<!-- =================== CONTACT DETAIL FORMS ===================== -->
 
 <template name="form">
   <form>
     <div class="list">
-  <label class="item item-input">
-    <input type="text" name="fName" placeholder="First Name">
-  </label>
-  <label class="item item-input">
-    <input type="text" name="lName" placeholder="Last Name">
-  </label>
-  <label class="item item-input">
-    <input type="text" name="phone" placeholder="Phone">
-  </label>
-</div>
-<button class='button button-full button-positive' type="submit" href='https://mobile-janisozolins.c9.io/' >Save Contact</button>
-</form>
-
-
+      <!-- ================ FIRST NAME ================ -->
+      <label class="item item-input">
+        <input type="text" name="fName" placeholder="First Name">
+      </label>
+      <!-- ================ LAST NAME ================ -->
+      <label class="item item-input">
+        <input type="text" name="lName" placeholder="Last Name">
+      </label>
+      <!-- ================ GENDER ================ -->
+      <label class="item item-input item-select">
+        <div class="input-label">
+          Gender
+        </div>
+        <select id="gender">
+          <option value="male" selected>Male</option>
+          <option value="female" >Female</option>
+        </select>
+      </label>
+      <!-- ================- PHONE ================ -->
+      <label class="item item-input">
+        <input type="text" name="phone" placeholder="Phone">
+      </label>
+      <!-- ================ EMAIL ================ -->
+      <label class="item item-input">
+        <input type="email" name="email" placeholder="Email">
+      </label>
+      <!-- ================ MAP ================== -->
+      <div class="map-container">
+          {{> googleMap name="addContactMap" options=initialFormMap}}
+      </div>
+    </div>
+    <button class='button button-full button-positive' type="submit">Save Contact</button>
+  </form>
 </template>
 
-<!-- ====================== SINGLE CONTACT PAGE ============================ -->
+<template name="editForm">
+  <form>
+    <div class="list">
+      <!-- ================ FIRST NAME ================ -->
+      <label class="item item-input">
+        <input type="text" id="editFName" name="fName" placeholder="First Name">
+      </label>
+      <!-- ================ LAST NAME ================ -->
+      <label class="item item-input">
+        <input type="text" id="editLName" name="lName" placeholder="Last Name">
+      </label>
+      <!-- ================ GENDER ================ -->
+      <label class="item item-input item-select">
+        <div class="input-label">
+          Gender
+        </div>
+        <select id="gender">
+          <option selected>Male</option>
+          <option>Female</option>
+        </select>
+      </label>
+      <!-- ================- PHONE ================ -->
+      <label class="item item-input">
+        <input type="text" id="editPhone" name="phone" placeholder="Phone">
+      </label>
+      <!-- ================ EMAIL ================ -->
+      <label class="item item-input">
+        <input type="email" id="editEmail" name="email" placeholder="Email">
+      </label>
+      <!-- ================ MAP ================== -->
+      <div class="map-container">
+          {{> googleMap name="editContactMap" options=initialEditFormMap}}
+      </div>
+    </div>
+    <button class='button button-full button-positive' type="submit" >Save Contact</button>
+  </form>
+</template>
+
+<!-- =================== SINGLE CONTACT PAGE ===================== -->
 
 <template name="contactPage">
-<center><h2>Hello, {{fName}}!</h2></center>
+  
+  <!-- ==================== HEADER& SETTINGS ===================== -->
+  
+  <!-- nav bar left button -->
+  
+  {{#contentFor "headerButtonLeft"}}
+    {{>ionNavBackButton}}
+  {{/contentFor}}
+  
+  <!-- nav bar -->
+  
+  {{#ionBody}}
+    {{> ionNavBar class="bar-positive"}}
+      {{#ionNavView}}
+        {{> yield}}
+      {{/ionNavView}}
+  {{/ionBody}}
 
-    <a class='button button-full button-assertive' href='/addContactForm' id='addContactForm'>Add New Contact</a>
+  <!-- header and options -->
+  
+  {{#contentFor "headerTitle"}}
+    {{#with contact}}
+      <h1 class="title">{{fName}} {{lName}}</h1>
+    {{/with}}
+  {{/contentFor}}
+  
+  <!-- tabs -->
+  
+  {{> tabs}}
+
+  <!-- actual content -->
+  
+  {{#ionView}}
+      {{#ionContent class="padding contact-detail"}}
+        {{#with contact}}
+          <div class="list card">
+            <!-- AVATAR & FULL NAME -->
+            <div class="item item-avatar">
+              <img src="https://randomuser.me/api/portraits/thumb/men/27.jpg">
+              <h2>{{fName}} {{lName}}</h2>
+            </div>
+            <!-- GENDER, PHONE, EMAIL & LOCATION -->
+            <div class="item item-body">
+              <h2>Gender: </h2> {{gender}}
+              <h2>Phone: </h2> {{phone}}
+              <h2>Email:</h2>  {{email}}
+              <h2>Location:</h2> 
+                <div class="map-container">
+                  {{> googleMap name="contactLocation" options=contactLocationOptions}}
+                </div>
+            </div>
+          </div>
+        {{/with}}
+      {{/ionContent}}
+  {{/ionView}}
 </template>
+
+<!-- ========================== TABS ============================= -->
+
+<template name='tabs'>
+  <div class="bar bar-footer bar-positive">
+    <!-- delete button -->
+    <button on-click="history.back()" class="button button-clear" id="btnDelete">Delete</button>
+    <!-- edit button -->
+    <button class="button button-clear" id="btnEdit">Edit</button>
+  </div>
+</template>
+
 
 
 
