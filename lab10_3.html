@@ -27,32 +27,57 @@
     <h1 class="title">Contact List</h1>
   {{/contentFor}}
 
-{{#ionView}}
-  {{#ionContent}}
-    <!-- <a class='button button-full button-assertive' href='/page2'>Go to Page 2</a> -->
-    <a class='button button-full button-assertive' href='/addContactForm' id='addNewContact'>Add New Contact</a>
-   {{> lists}}
-  {{/ionContent}}
-{{/ionView}}
+  {{#ionView}}
+    {{#ionContent}}
+      <!-- ADD NEW CONTACT BUTTON -->
+      <a class='button button-full button-assertive' href='/addContactForm' id='addNewContact'>Add New Contact</a>
+      <!-- SEARCH BAR -->
+      <label id="searchbarlabel" class="item item-input">
+        <input type="search" id="searchbar" name="search" placeholder="Search">
+      </label>
+      <!-- SORT BY FIRST OR LAST NAME -->
+      {{> sort}}
+      <!-- FULL LIST OR ONLY SEARCHED ITEMS -->
+      {{#if displayList}}
+        {{> lists}}
+      {{else}}
+        {{> searchLists}}
+      {{/if}}
+     
+    {{/ionContent}}
+  {{/ionView}}
 </template>
 
 <!-- ====================== EDIT FORM ========================== -->
 
 <template name='editContact'>
+  
+  <!-- HEADER & NAV BAR -->
+  
   {{#contentFor "headerButtonLeft"}}
     {{>ionNavBackButton}}
   {{/contentFor}}
+  
+  {{#ionBody}}
+      {{> ionNavBar class="bar-positive"}}
+      {{#ionNavView}}
+        {{> yield}}
+      {{/ionNavView}}
+  {{/ionBody}}
 
   {{#contentFor "headerTitle"}}
     <h1 class="title">{{fName}} {{lName}}</h1>
   {{/contentFor}}
-
+  
+  
+  <!-- CONTENT -->
+  
   {{#ionView}}
     {{#ionContent}}
-      <a class='button button-full button-positive' href='/' >BACK</a>
       {{> editForm}}
     {{/ionContent}}
   {{/ionView}}
+  
 </template>
 
 <!-- ====================== ADD FORM ============================ -->
@@ -76,6 +101,28 @@
 <!-- ==================== LIST OF CONTACTS ====================== -->
 
 <template name="lists">
+      {{#ionList}}
+
+        {{#each contacts}}
+
+          {{#ionItem path='contact.detail' buttonRight=true avatar=true class="item-icon-right"}}
+
+            <img src="https://media.licdn.com/mpr/mpr/shrink_100_100/p/2/005/099/2e2/3c4a8b8.jpg">
+            <h2>{{fName}} {{lName}}</h2>
+            <p>
+              {{phone}}
+            </p>
+            <a class="button button-balanced" href="/contact/{{_id}}">{{> ionIcon icon="ios-arrow-forward"}}</a>
+
+          {{/ionItem}}
+
+        {{/each}}
+
+      {{/ionList}}
+
+</template>
+
+<template name="searchLists">
 
       {{#ionList}}
 
@@ -104,15 +151,21 @@
 <template name="form">
   <form>
     <div class="list">
+      
       <!-- ================ FIRST NAME ================ -->
+      
       <label class="item item-input">
-        <input type="text" name="fName" placeholder="First Name">
+        <input id="addFName" type="text" name="fName" placeholder="First Name">
       </label>
+      
       <!-- ================ LAST NAME ================ -->
+      
       <label class="item item-input">
-        <input type="text" name="lName" placeholder="Last Name">
+        <input id="addLName" type="text" name="lName" placeholder="Last Name">
       </label>
+      
       <!-- ================ GENDER ================ -->
+      
       <label class="item item-input item-select">
         <div class="input-label">
           Gender
@@ -122,59 +175,66 @@
           <option value="female" >Female</option>
         </select>
       </label>
+      
       <!-- ================- PHONE ================ -->
+      
       <label class="item item-input">
-        <input type="text" name="phone" placeholder="Phone">
+        <input id="addPhone" type="text" name="phone" placeholder="Phone">
       </label>
+      
       <!-- ================ EMAIL ================ -->
+      
       <label class="item item-input">
-        <input type="email" name="email" placeholder="Email">
+        <input id="addEmail" type="email" name="email" placeholder="Email">
       </label>
+      
       <!-- ================ MAP ================== -->
+      
       <div class="map-container">
           {{> googleMap name="addContactMap" options=initialFormMap}}
       </div>
+      
     </div>
     <button class='button button-full button-positive' type="submit">Save Contact</button>
   </form>
 </template>
 
 <template name="editForm">
-  <form>
-    <div class="list">
-      <!-- ================ FIRST NAME ================ -->
-      <label class="item item-input">
-        <input type="text" id="editFName" name="fName" placeholder="First Name">
-      </label>
-      <!-- ================ LAST NAME ================ -->
-      <label class="item item-input">
-        <input type="text" id="editLName" name="lName" placeholder="Last Name">
-      </label>
-      <!-- ================ GENDER ================ -->
-      <label class="item item-input item-select">
-        <div class="input-label">
-          Gender
+    <form>
+      <div class="list">
+        <!-- ================ FIRST NAME ================ -->
+        <label class="item item-input">
+          <input id="editFName" type="text" name="fName" placeholder="First Name">
+        </label>
+        <!-- ================ LAST NAME ================ -->
+        <label class="item item-input">
+          <input id="editLName" type="text" name="lName" placeholder="Last Name">
+        </label>
+        <!-- ================ GENDER ================ -->
+        <label class="item item-input item-select">
+          <div class="input-label">
+            Gender
+          </div>
+          <select id="gender">
+            <option selected>Male</option>
+            <option>Female</option>
+          </select>
+        </label>
+        <!-- ================- PHONE ================ -->
+        <label class="item item-input">
+          <input type="text" id="editPhone" name="phone" placeholder="Phone">
+        </label>
+        <!-- ================ EMAIL ================ -->
+        <label class="item item-input">
+          <input type="email" id="editEmail" name="email" placeholder="Email">
+        </label>
+        <!-- ================ MAP ================== -->
+        <div class="map-container">
+            {{> googleMap name="editContactMap" options=initialEditFormMap}}
         </div>
-        <select id="gender">
-          <option selected>Male</option>
-          <option>Female</option>
-        </select>
-      </label>
-      <!-- ================- PHONE ================ -->
-      <label class="item item-input">
-        <input type="text" id="editPhone" name="phone" placeholder="Phone">
-      </label>
-      <!-- ================ EMAIL ================ -->
-      <label class="item item-input">
-        <input type="email" id="editEmail" name="email" placeholder="Email">
-      </label>
-      <!-- ================ MAP ================== -->
-      <div class="map-container">
-          {{> googleMap name="editContactMap" options=initialEditFormMap}}
       </div>
-    </div>
-    <button class='button button-full button-positive' type="submit" >Save Contact</button>
-  </form>
+      <button class='button button-full button-positive' type="submit">Save Contact</button>
+    </form>
 </template>
 
 <!-- =================== SINGLE CONTACT PAGE ===================== -->
@@ -242,10 +302,24 @@
 <template name='tabs'>
   <div class="bar bar-footer bar-positive">
     <!-- delete button -->
-    <button on-click="history.back()" class="button button-clear" id="btnDelete">Delete</button>
+    <button class="button button-clear" id="btnDelete">Delete</button>
     <!-- edit button -->
     <button class="button button-clear" id="btnEdit">Edit</button>
   </div>
+</template>
+
+<template name='sort'>
+  <label class="item item-input item-select">
+    <!-- LABEL -->
+    <div class="input-label">
+      Sort by
+    </div>
+    <!-- SELECTOR -->
+    <select id="sort">
+      <option value="fName" selected>First Name</option>
+      <option value="lName" >Last Name</option>
+    </select>
+  </label>
 </template>
 
 

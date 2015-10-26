@@ -1,7 +1,21 @@
 /* global contactList*/
 contactList = new Mongo.Collection('contactList');
 
+
+
+
 if (Meteor.isClient) {
+  
+  Meteor.myFunctions = {
+
+    searchCheck : function() {
+
+    },
+
+  };
+  
+  Session.set("currentList", "");
+  Session.set("sort", "fName");
   
   // ====================== ROUTERS ============================================
       
@@ -18,14 +32,14 @@ if (Meteor.isClient) {
       this.render('page1');
       }),
       
-      //router for contact page (where details are displayed)
+      //router for dynamic CONTACT and EDIT pages
       
       Router.map(function() {
         this.route('contact.detail', {path:'/contact/:_id', layoutTemplate: 'contactPage'});
         this.route('contact.edit', {path:'/edit/:_id', layoutTemplate: 'editContact'});
       });
     
-      // router for add contact page
+      // router for addContactForm
       Router.route('/addContactForm');
   
   // ====================== GOOGLE MAPS ========================================
@@ -35,15 +49,66 @@ if (Meteor.isClient) {
         GoogleMaps.load();
       });
 
-  // ====================== CONTACT LIST HELPERS ===============================
+  // ====================== CONTACT LISTS ======================================
 
       Template.lists.helpers({
         contacts : function(){
-              return contactList.find();
+          if (Session.get('currentList') === "" || "all")
+          {
+            var criteria = Session.get("sort");
+            if (criteria === "fName")
+              return contactList.find({},{sort:{fName: 1}});
+            else 
+              return contactList.find({},{sort:{lName: 1}});
+            
+          }
+          if (Session.get("currentList") === "search")
+          {
+            
+          }
         },
-  
+      });
+      
+      Template.searchLists.helpers({
+        contacts : function(){
+          var searchParameter = Session.get('searchParameter');
+          var criteria = Session.get("sort");
+          if (criteria === "fName")
+            return contactList.find({ $or: [ { fName: searchParameter }, { lName: searchParameter }, { gender: searchParameter }, { phone: searchParameter }, { email: searchParameter } ] },{sort:{fName: 1}});
+          else 
+            return contactList.find({ $or: [ { fName: searchParameter }, { lName: searchParameter }, { gender: searchParameter }, { phone: searchParameter }, { email: searchParameter } ] },{sort:{lName: 1}});
 
-});
+        }
+      })
+      
+  // ====================== FRONT PAGE   =======================================
+
+      Template.page1.events({
+        "keyup #searchbar" : function() {
+          /* global value*/
+          var value = document.getElementById("searchbar").value;
+          // if search bar is empty or search term is deleted, set variable to ""
+          if ( value === "")
+            {
+              Session.set('currentList', "")
+            }
+          // if search bar contains characters, set it to a variable and prepare for search
+          else
+            {
+              Session.set('currentList', 'search');
+              Session.set('searchParameter', value);
+            }
+        },
+      })
+      
+      Template.page1.helpers({
+        displayList : function() {
+          if (Session.get('currentList') === '')
+            return true;
+          else
+            return false;
+        }
+      })
 
   // ====================== SINGLE CONTACT PAGE   ==============================
 
@@ -69,6 +134,7 @@ if (Meteor.isClient) {
       });
   
       Template.contactPage.onCreated(function() {
+        // adds marker to the map
         GoogleMaps.ready('contactLocation', function(map) {
             // Add a marker to the map once it's ready
             var marker = new google.maps.Marker({
@@ -95,6 +161,18 @@ if (Meteor.isClient) {
        Router.go('/edit/'+Router.current().params._id);
       }
       });
+      
+      Template.sort.events({
+      "change #sort" : function() {
+      var sorter = document.getElementById("sort");
+      var sortvalue = sorter.options[sorter.selectedIndex].value;
+      
+      if (sortvalue === "fName")
+        Session.set("sort", "fName");
+      else
+        Session.set("sort", "lName");
+      }
+      });
   
   // ====================== ADD CONTACTS PAGE =================================
   
@@ -111,10 +189,45 @@ if (Meteor.isClient) {
         var gen = document.getElementById("gender");
         var inputGender = gen.options[gen.selectedIndex].value;
         
+        // checks if the following fields are not empty
+        if(document.getElementById("addFName").value === "")
+          {
+            alert("Please fill in all fields!");
+            return false;
+          }
+        if(document.getElementById("addLName").value === "")
+          {
+            alert("Please fill in all fields!");
+            return false;
+          }
+        if(document.getElementById("addPhone").value === "")
+          {
+            alert("Please fill in all fields!");
+            return false;
+          }
+        if(document.getElementById("addEmail").value === "")
+          {
+            alert("Please fill in all fields!");
+            return false;
+          }
+        if(Session.get('latitude') === "" || undefined)
+          {
+            alert("Please fill in all fields!");
+            return false;
+          }
+        if(Session.get('longitude') === "" || undefined)
+          {
+            alert("Please fill in all fields!");
+            return false;
+          }
+    
         
         var object = {fName: inputFirstName, lName: inputLastName, gender: inputGender, phone: inputPhone, email: inputEmail, latitude: inputLatitude, longitude: inputLongitude}
         
         contactList.insert(object);
+        
+        Session.set("latitude", "");
+        Session.set("latitude", "");
         
         Router.go('/');
         
@@ -144,8 +257,6 @@ if (Meteor.isClient) {
             Session.set("longitude", event.latLng.lng());
       
           addMarker(event.latLng);
-          Session.set("latitude", event.latLng.lat());
-          Session.set("longitude", event.latLng.lng());
           // contactList.findOne({_id: Router.current().params._id}, {latitude: event.latLng.lat()});
           // contactList.findOne({_id: Router.current().params._id}, {latitude: event.latLng.lng()});
           });
@@ -182,13 +293,36 @@ if (Meteor.isClient) {
         
         
         if(document.getElementById("gender").value != (undefined || null) )
-        {
-        var gen = document.getElementById("gender");
-        vainputGender = gen.options[gen.selectedIndex].value;
-        }
+          {
+            var gen = document.getElementById("gender");
+            var inputGender = gen.options[gen.selectedIndex].value;
+          }
+        
+        // checks if the following fields are not empty
+        if(document.getElementById("editFName").value === "")
+          {
+            alert("Please fill in all fields!");
+            return false;
+          }
+        if(document.getElementById("editLName").value === "")
+          {
+            alert("Please fill in all fields!");
+            return false;
+          }
+        if(document.getElementById("editPhone").value === "")
+          {
+            alert("Please fill in all fields!");
+            return false;
+          }
+        if(document.getElementById("editEmail").value === "")
+          {
+            alert("Please fill in all fields!");
+            return false;
+          }
         
         contactList.update({_id: Router.current().params._id}, {fName: inputFirstName, lName: inputLastName, gender: inputGender, phone: inputPhone, email: inputEmail, latitude: inputLatitude, longitude: inputLongitude});
-
+        Session.set("latitude", "");
+        Session.set("latitude", "");
         Router.go('/');
         
         return false;
@@ -238,20 +372,39 @@ if (Meteor.isClient) {
     });
     
       Template.editForm.helpers({
-      initialEditFormMap: function() {
-          // Make sure the maps API has loaded
-          if (GoogleMaps.loaded()) {
-            // Map initialization options
-            var latitude = parseFloat(contactList.findOne({_id: Router.current().params._id}).latitude);
-            var longitude = parseFloat(contactList.findOne({_id: Router.current().params._id}).longitude);
-            return {
-
-              center: new google.maps.LatLng(latitude, longitude ),
-              zoom: 8
-            };
-          }
-        },
+        initialEditFormMap: function() 
+        {
+            // Make sure the maps API has loaded
+            if (GoogleMaps.loaded()) {
+              // Map initialization options
+              var latitude = parseFloat(contactList.findOne({_id: Router.current().params._id}).latitude);
+              var longitude = parseFloat(contactList.findOne({_id: Router.current().params._id}).longitude);
+              return {
+  
+                center: new google.maps.LatLng(latitude, longitude ),
+                zoom: 8
+              };
+            }
+          },
       });
+      
+      Template.editForm.rendered = function() {
+        if(!this._rendered) 
+          {
+            var edFName = contactList.findOne({_id: Router.current().params._id}).fName;
+            document.getElementById("editFName").value = edFName;
+            
+            var edLName = contactList.findOne({_id: Router.current().params._id}).lName;
+            document.getElementById("editLName").value = edLName;
+            
+            var edPhone = contactList.findOne({_id: Router.current().params._id}).phone;
+            document.getElementById("editPhone").value = edPhone;
+            
+            var edEmail = contactList.findOne({_id: Router.current().params._id}).email;
+            document.getElementById("editEmail").value = edEmail;
+          }
+      }
+
   
 }
 

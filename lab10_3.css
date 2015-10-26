@@ -9,3 +9,7 @@
 .view {
   background-color: #f8f8f8;
 }
+
+label#searchbarlabel {
+    margin: 15px;
+}
